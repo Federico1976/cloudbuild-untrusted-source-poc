@@ -1,0 +1,28 @@
+steps:
+  - name: ubuntu:22.04
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        set -x
+        echo "=== UNTRUSTED CONFIG EXECUTED ==="
+        echo "PWD=$(pwd)"
+
+        echo "=== WORKSPACE FILE LIST ==="
+        find /workspace -maxdepth 2 -type f -print || true
+
+        echo "=== CHECK SOURCE MARKERS ==="
+        if test -f /workspace/attacker-controlled.txt; then
+          echo "UNTRUSTED_SOURCE_MARKER_PRESENT"
+          cat /workspace/attacker-controlled.txt
+        else
+          echo "UNTRUSTED_SOURCE_MARKER_NOT_PRESENT"
+        fi
+
+        if test -f /workspace/cloudbuild.yaml; then
+          echo "CLOUDBUILD_YAML_PRESENT"
+        fi
+
+        echo "=== END UNTRUSTED CONFIG PROOF ==="
+options:
+  logging: CLOUD_LOGGING_ONLY
